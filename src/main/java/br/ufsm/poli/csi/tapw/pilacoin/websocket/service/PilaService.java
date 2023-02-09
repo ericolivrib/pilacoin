@@ -28,7 +28,7 @@ public class PilaService {
     private final HttpHeaders headers;
 
 
-    public PilaService(PilaRepository pilaRepository) {
+    public PilaService() {
         template = new RestTemplate();
         headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

@@ -12,7 +12,4 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
             "FROM usuario u WHERE u.email = ?1", nativeQuery = true)
     Object[][] findUsuarioByEmail(String email);
 
-    @Query(value = "SELECT u.chave_publica FROM usuario u WHERE u.nome = ?1", nativeQuery = true)
-    byte[] findPublicKeyByNome(String nome);
-
 }

@@ -1,6 +1,8 @@
 package br.ufsm.poli.csi.tapw.pilacoin.controller;
 
+import br.ufsm.poli.csi.tapw.pilacoin.model.Log;
 import br.ufsm.poli.csi.tapw.pilacoin.model.Usuario;
+import br.ufsm.poli.csi.tapw.pilacoin.repository.LogRepository;
 import br.ufsm.poli.csi.tapw.pilacoin.repository.UsuarioRepository;
 import br.ufsm.poli.csi.tapw.pilacoin.security.util.CookieUtil;
 import br.ufsm.poli.csi.tapw.pilacoin.security.util.JwtUtil;
@@ -20,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.Date;
+
 @Controller
 public class LoginController {
 
@@ -29,6 +33,8 @@ public class LoginController {
     private AuthenticationManager authenticationManager;
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private LogRepository logRepository;
 
     @GetMapping("login")
     public String login() {
@@ -54,10 +60,12 @@ public class LoginController {
                 request.getSession().setAttribute("user", usuario);
                 CookieUtil.setCookie("token", token, response);
 
+                logRepository.save(new Log(usuario.getNome() + " acessou o sistema", new Date()));
                 logger.info("Login efetuado! | Usuário: {}", usuario.getNome());
                 mv.setViewName("redirect:home");
             }
         } catch (AuthenticationException e) {
+            logRepository.save((new Log("Falha de autenticação para o email " + email, new Date())));
             logger.error("Falha de autenticação de usuário!");
             mv.setViewName("login");
             mv.addObject("erro", true);

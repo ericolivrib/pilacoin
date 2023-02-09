@@ -11,6 +11,11 @@ public class Log {
     private String mensagem;
     private Date data;
 
+    public Log(String mensagem, Date data) {
+        this.mensagem = mensagem;
+        this.data = data;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     public Long getId() {

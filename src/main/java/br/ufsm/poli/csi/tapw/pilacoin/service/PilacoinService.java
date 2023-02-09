@@ -133,14 +133,14 @@ public class PilacoinService {
             BigInteger numHash;
             BigInteger dificuldade = stompClient.getDificuldade();
 
-            new Log();
-
+            logRepository.save(new Log(usuario.getNome() + " começou a minerar de pilacoins", new Date()));
             logger.info("{} começou a minerar de pilacoins", usuario.getNome());
 
             while (threads[0].isAlive()) {
                 synchronized (this) {
                     if (!running[0]) {
                         try {
+                            logRepository.save(new Log(usuario.getNome() + " finalizou a mineração de pilacoins", new Date()));
                             logger.info("{} finalizou a mineração de pilacoins", usuario.getNome());
                             wait();
                         } catch (InterruptedException ignored) {
@@ -160,6 +160,7 @@ public class PilacoinService {
                     numHash = getNumHash(pila);
                 } while (numHash.compareTo(dificuldade) > 0);
 
+                logRepository.save(new Log(usuario.getNome() + " minerou um pilacoin", new Date()));
                 logger.info("{} minerou um pilacoin: [{}]", usuario.getNome(), pila.getNonce());
                 pilaService.salvar(pila);
                 noncesColetados.add(pila.getNonce());
@@ -181,12 +182,14 @@ public class PilacoinService {
             BigInteger dificuldade = stompClient.getDificuldade();
             List<String> noncesInvalidos = new ArrayList<>();
 
+            logRepository.save(new Log(usuario.getNome() + " começou a validar pilacoins", new Date()));
             logger.info("{} começou a validar pilacoins", usuario.getNome());
 
             while (threads[1].isAlive()) {
                 synchronized (this) {
                     if (!running[1]) {
                         try {
+                            logRepository.save(new Log(usuario.getNome() + " finalizou a validação de pilacoins", new Date()));
                             logger.info("{} finalizou a validação de pilacoins", usuario.getNome());
                             wait();
                         } catch (InterruptedException ignored) {
@@ -200,6 +203,7 @@ public class PilacoinService {
                     var numHash = getNumHash(pila);
 
                     if (numHash.compareTo(dificuldade) <= 0) {
+                        logRepository.save(new Log(usuario.getNome() + " validou um pilacoin", new Date()));
                         logger.info("{} validou um pilacoin: [{}]", usuario.getNome(), pila.getNonce());
 
                         byte[] assinatura = getAssinatura(numHash, usuario.getChavePublica());
@@ -215,6 +219,7 @@ public class PilacoinService {
                         noncesColetados.add(pilaValido.getNonce());
                     } else {
                         noncesInvalidos.add(pila.getNonce());
+                        logRepository.save(new Log(usuario.getNome() + " invalidou um pilacoin", new Date()));
                         logger.warn("{} invalidou um pilacoin: [{}]", usuario.getNome(), pila.getNonce());
                     }
                 }
@@ -237,12 +242,14 @@ public class PilacoinService {
             BigInteger numHash;
             BigInteger dificuldade = stompClient.getDificuldade();
 
+            logRepository.save(new Log(usuario.getNome() + " começou a minerar blocos", new Date()));
             logger.info("{} começou a minerar blocos", usuario.getNome());
 
             while (threads[2].isAlive()) {
                 synchronized (this) {
                     if (!running[2]) {
                         try {
+                            logRepository.save(new Log(usuario.getNome() + " finalizou a mineração de blocos", new Date()));
                             logger.info("{} finalizou a mineração de blocos", usuario.getNome());
                             wait();
                         } catch (InterruptedException ignored) {
@@ -261,6 +268,7 @@ public class PilacoinService {
                     numHash = getNumHash(bloco);
                 } while (numHash.compareTo(dificuldade) > 0);
 
+                logRepository.save(new Log(usuario.getNome() + " minerou um bloco", new Date()));
                 logger.info("{} minerou um bloco: [{}]", usuario.getNome(), bloco.getNonce());
                 blocoService.salvar(bloco);
                 noncesColetados.add(bloco.getNonce());
@@ -282,12 +290,14 @@ public class PilacoinService {
             BigInteger numHash;
             BigInteger dificuldade = stompClient.getDificuldade();
 
+            logRepository.save(new Log(usuario.getNome() + " começou a validar blocos", new Date()));
             logger.info("{} começou a validar blocos", usuario.getNome());
 
             while (threads[3].isAlive()) {
                 synchronized (this) {
                     if (!running[3]) {
                         try {
+                            logRepository.save(new Log(usuario.getNome() + " finalizou a validação de blocos", new Date()));
                             logger.info("{} finalizou a validação de blocos", usuario.getNome());
                             wait();
                         } catch (InterruptedException ignored) {
@@ -299,6 +309,7 @@ public class PilacoinService {
                 numHash = getNumHash(bloco);
 
                 if (numHash.compareTo(dificuldade) <= 0) {
+                    logRepository.save(new Log(usuario.getNome() + " validou um bloco", new Date()));
                     logger.info("{} validou um bloco: [{}]", usuario.getNome(), bloco.getNonce());
 
                     byte[] assinatura = getAssinatura(numHash, usuario.getChavePublica());
@@ -313,6 +324,7 @@ public class PilacoinService {
                     blocoService.validar(blocoValido);
                     noncesColetados.add(blocoValido.getNonce());
                 } else {
+                    logRepository.save(new Log(usuario.getNome() + " invalidou um bloco", new Date()));
                     logger.warn("{} invalidou um bloco: [{}]", usuario.getNome(), bloco.getNonce());
                 }
             }
